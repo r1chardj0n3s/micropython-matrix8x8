@@ -51,19 +51,14 @@ class Matrix8x8:
         """
         Send single row over I2C.
         """
-        data = bytes((self.row_addr[row], rotate_right(self.buf[row])))
+        data = bytes((self.row_addr[row], self.buf[row]))
         self._send(data)
 
     def _send_buf(self):
         """
         Send buffer over I2C.
         """
-        data = bytearray(16)
-        i = 1
-        for byte in self.buf:
-            data[i] = rotate_right(byte)
-            i += 2
-        self._send(data)
+        self._send(self.buf)
 
     def _clear_column(self, column):
         """
@@ -180,14 +175,3 @@ class Matrix8x8:
         self.buf[row] &= ~(0x80 >> column)
         self._send_row(row)
 
-
-def rotate_right(byte):
-    """
-    Rotate bits right.
-    """
-    byte &= 0xFF
-    bit = byte & 0x01
-    byte >>= 1
-    if(bit):
-        byte |= 0x80
-    return byte
