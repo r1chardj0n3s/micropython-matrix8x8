@@ -1,4 +1,4 @@
-import pyb
+from machine import I2C, Pin
 
 
 class Matrix8x8:
@@ -31,10 +31,11 @@ class Matrix8x8:
         if i2c:
             self.i2c = i2c
         else:
-            self.i2c = pyb.I2C(i2c_bus, pyb.I2C.MASTER, baudrate=400000)
+            self.i2c = I2C(scl=Pin(5), sda=Pin(4), freq=100000)
+            self.i2c.start()
 
         # set HT16K33 oscillator on
-        self._send(0x21)
+        self._send(b'\x21')
 
         self.set_brightness(brightness)
         self.clear()
@@ -44,7 +45,7 @@ class Matrix8x8:
         """
         Send data over I2C.
         """
-        self.i2c.send(data, self.addr)
+        self.i2c.writeto(self.addr, data)
 
     def _send_row(self, row):
         """
@@ -94,7 +95,7 @@ class Matrix8x8:
         Turn on display.
         """
         self.is_on = True
-        self._send(0x81 | self._blinking << 1)
+        self._send(chr(0x81 | self._blinking << 1))
 
     def off(self):
         """
@@ -102,13 +103,13 @@ class Matrix8x8:
         brightness, blinking, ...).
         """
         self.is_on = False
-        self._send(0x80)
+        self._send(b'\x80')
 
     def set_brightness(self, value):
         """
         Set display brightness. Value from 0 (min) to 15 (max).
         """
-        self._send(0xE0 | value)
+        self._send(chr(0xE0 | value))
 
     def set_blinking(self, mode):
         """
