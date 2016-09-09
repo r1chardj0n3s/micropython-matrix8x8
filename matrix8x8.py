@@ -95,7 +95,7 @@ class Matrix8x8:
         Turn on display.
         """
         self.is_on = True
-        self._send(chr(0x81 | self._blinking << 1))
+        self._send(bytes([0x81 | self._blinking << 1]))
 
     def off(self):
         """
@@ -109,7 +109,7 @@ class Matrix8x8:
         """
         Set display brightness. Value from 0 (min) to 15 (max).
         """
-        self._send(chr(0xE0 | value))
+        self._send(bytes([0xE0 | value]))
 
     def set_blinking(self, mode):
         """
